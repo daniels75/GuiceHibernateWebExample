@@ -1,4 +1,4 @@
-package org.daniels.samples.rest.infrastructure;
+package org.daniels.samples.modules;
 
 import com.google.inject.AbstractModule;
 

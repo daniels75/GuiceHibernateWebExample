@@ -1,0 +1,32 @@
+CREATE DATABASE `hibernateguicetest` ;
+
+
+CREATE TABLE `Article` (
+`id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`name` VARCHAR(30) NOT NULL ,
+`price` DOUBLE NOT NULL
+) 
+
+
+
+CREATE TABLE `Customer` (
+`id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`name` VARCHAR(30) NOT NULL ,
+`street` VARCHAR(30) NOT NULL ,
+`city` VARCHAR(30) NOT NULL ,
+`postcode` VARCHAR(30) NOT NULL ,
+`phone` VARCHAR(30) NOT NULL
+) 
+
+
+
+CREATE TABLE `Orders` (
+`id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`customerId` BIGINT NOT NULL,
+`articleId` BIGINT NOT NULL,
+`amount` INT NOT NULL ,
+`orderDate` DATE NOT NULL ,
+`sum` DOUBLE NOT NULL ,
+FOREIGN KEY (customerId) REFERENCES Customer(id),
+FOREIGN KEY (articleId) REFERENCES Article(id)
+) 

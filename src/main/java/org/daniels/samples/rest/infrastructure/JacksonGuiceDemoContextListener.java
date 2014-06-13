@@ -1,6 +1,7 @@
 package org.daniels.samples.rest.infrastructure;
 
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
+import org.daniels.samples.modules.UserModule;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;

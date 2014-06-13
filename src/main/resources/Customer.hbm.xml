@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+  <class name="org.daniels.examples.model.Customer" table="customer">
+    <id name="id" column="id">
+      <generator class="native" />
+    </id>
+    <property name="name" column="name" not-null="true" />
+    <property name="street" column="street" not-null="true" />
+    <property name="city" column="city" not-null="true" />
+    <property name="postcode" column="postcode" not-null="true" />
+    <property name="phone" column="phone" not-null="true" />
+  </class>
+</hibernate-mapping>
+

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+  <class name="org.daniels.examples.model.Orders" table="orders">
+    <id name="id" column="id">
+      <generator class="native" />
+    </id>
+    <property name="amount" column="amount" not-null="true" />
+    <property name="orderDate" column="orderDate" not-null="true" />
+    <property name="sum" column="sum" not-null="true" />
+    <many-to-one name="customer" class="org.daniels.examples.model.Customer" column="customerId" cascade="save-update"/>
+    <many-to-one name="article" class="org.daniels.examples.model.Article" column="articleId" cascade="save-update"/>
+  </class>
+</hibernate-mapping>
+
