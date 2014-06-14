@@ -29,8 +29,7 @@ public class HibernateUtil {
 	/** Session Factory */
 	private  SessionFactory sessionFactory;
 
-	/** JNDI name of sessionfactory. */
-	private  final String JNDI_SESSIONFACTORY = "java:hibernate/HibernateFactory";
+
 
 	/** If running unit tests set to true. */
 	//private  boolean offlineMode = true;
@@ -41,18 +40,9 @@ public class HibernateUtil {
 	/** threadlocal. */
 	private  final ThreadLocal threadTransaction = new ThreadLocal();
 
-	/** threadlocal. */
-	//private  final ThreadLocal threadInterceptor = new ThreadLocal();
 
-	/** Interceptor class */
-	private  final String INTERCEPTOR_CLASS = "hibernate.util.interceptor_class";
-
-	
 	/**
-	 * Create the initial SessionFactory from hibernate.xml.cfg or JNDI).
-	 * #### Use this Function to initialize Hibernate! ####	 
-	 * 
-	 * @param offlineMode true=hibernate.cfg.xml , false=JNDI
+	 * Create the initial SessionFactory from hibernate.xml.cfg
 	 */
 	public  void configure() {
 		log.debug("HibernateUtil.Configure() - Trying to initialize Hibernate.");
@@ -165,7 +155,7 @@ public class HibernateUtil {
 		synchronized (sessionFactory) {
 			try {
 				log.debug("HibernateUtil.closeSessionFactory() - Destroy the current SessionFactory.");
-				disconnectSession();
+				closeSession();
 				sessionFactory.close();
 				// Clear  variables
 				configuration = null;
@@ -217,7 +207,7 @@ public class HibernateUtil {
 		}
 	}
 
-	
+
         /**
 	 * Start a new database transaction.
 	 */
@@ -273,94 +263,12 @@ public class HibernateUtil {
 	}
 
   
-        /**
-	 * Reconnects a Hibernate Session to the current Thread.
-	 * 
-	 * @param session The Hibernate Session to be reconnected.
-	 */
-	public  void reconnect(Session session) throws InfrastructureException {
-		log.debug("HibernateUtil.reconnect() - Reconnecting Hibernate Session to the current Thread.");
-		try {
-			//session.reconnect(session.connection());
-			threadSession.set(session);
-		} catch (HibernateException x) {
-			throw new InfrastructureException("HibernateUtil.reconnect() - Error reconnectin to the given session.",x);
-		}
-	}
 
   
-       /**
-	 * Disconnect and return Session from current Thread.
-	 * 
-	 * @return Session the disconnected Session
-	 */
-	public  Session disconnectSession() throws InfrastructureException {
-		log.debug("HibernateUtil.disconnectSession() - Disconnecting Session from current Thread.");
-		Session session = getSession();
-		try {
-			threadSession.set(null);
-			if (session.isConnected() && session.isOpen()) {
-				session.disconnect();
-			}
-		} catch (HibernateException x) {
-			throw new InfrastructureException("HibernateUtil.disconnectSession() - Error disconnecting session from current thread.",x);
-		}
-		return session;
-	}
+
+
+
+  
 
 	
-       /**
-	 * Register a Hibernate interceptor with the current thread.
-	 * 
-	 * Every Session opened is opened with this interceptor after registration.
-	 * Has no effect if the current Session of the thread is already open,
-	 * effective on next close()/getSession().
-	 */
-//	public  void registerInterceptor(Interceptor interceptor) {
-//		threadInterceptor.set(interceptor);
-//	}
-
-
-        /**
-	 * Get Hibernate interceptor.
-	 * 
-	 * @return Interceptor
-	 */
-//	private  Interceptor getInterceptor() {
-//		Interceptor interceptor = (Interceptor) threadInterceptor.get();
-//		return interceptor;
-//	}
-  
-  
-        /**
-	 * Resets global interceptor to default state.
-	 */
-//	public  void resetInterceptor() {
-//		log.debug("HibernateUtil.resetInterceptor() - Resetting global interceptor to configuration setting");
-//		setInterceptor(configuration, null);
-//	}
-
-  
-        /**
-	 * Either sets the given interceptor on the configuration or looks it up
-	 * from configuration if null.
-	 */
-	private  void setInterceptor(Configuration configuration, Interceptor interceptor) {
-		String interceptorName = configuration.getProperty(INTERCEPTOR_CLASS);
-		if (interceptor == null && interceptorName != null) {
-			try {
-				log.debug("HibernateUtil.setInterceptor() - Configuring interceptor.");
-				Class interceptorClass = HibernateUtil.class.getClassLoader().loadClass(interceptorName);
-				interceptor = (Interceptor) interceptorClass.newInstance();
-			} catch (Exception x) {
-				throw new RuntimeException("HibernateUtil.setInterceptor() - Error, could not configure interceptor: " + interceptorName, x);
-			}
-		}
-		if (interceptor != null) {
-			configuration.setInterceptor(interceptor);
-		} else {
-			configuration.setInterceptor(EmptyInterceptor.INSTANCE);
-		}
-	}
-	
-} // .EOF
+} 

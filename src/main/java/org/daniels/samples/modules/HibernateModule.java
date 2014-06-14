@@ -18,7 +18,7 @@ public class HibernateModule extends AbstractModule{
     protected void configure() {
         
         /**
-         * Without the Scopes.SINGLETON, each time wenn you call 
+         * Without the Scopes.SINGLETON, each time when you call 
          * HibernateConnection connection = injector.getInstance(HibernateConnection.class); 
          * a new Instance of HibernateConnection (with the included HibernateUtil) will be created.
          */
