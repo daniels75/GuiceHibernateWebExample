@@ -1,11 +1,10 @@
-package org.daniels.examples.util;
+package eu.jdevelop.hibernateconnectionwithguice.util;
 
+import eu.jdevelop.hibernateconnectionwithguice.exceptions.InfrastructureException;
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.daniels.examples.exceptions.InfrastructureException;
-
 import javax.naming.*;
 
 /**
@@ -33,7 +32,7 @@ public class HibernateUtil {
 	private  final String JNDI_SESSIONFACTORY = "java:hibernate/HibernateFactory";
 
 	/** If running unit tests set to true. */
-	//private  boolean offlineMode = true;
+	private  boolean offlineMode = true;
 
 	/** threadlocal. */
 	private  final ThreadLocal threadSession = new ThreadLocal();
@@ -42,7 +41,7 @@ public class HibernateUtil {
 	private  final ThreadLocal threadTransaction = new ThreadLocal();
 
 	/** threadlocal. */
-	//private  final ThreadLocal threadInterceptor = new ThreadLocal();
+	private  final ThreadLocal threadInterceptor = new ThreadLocal();
 
 	/** Interceptor class */
 	private  final String INTERCEPTOR_CLASS = "hibernate.util.interceptor_class";
@@ -54,10 +53,11 @@ public class HibernateUtil {
 	 * 
 	 * @param offlineMode true=hibernate.cfg.xml , false=JNDI
 	 */
-	public  void configure() {
+	public  void Configure(boolean offlineMode) {
 		log.debug("HibernateUtil.Configure() - Trying to initialize Hibernate.");
 		try {
 			// Use hibernate.cfg.xml (true) or JNDI (false)
+			setOfflineMode(offlineMode);
 			sessionFactory = getSessionFactory();
 
 		} catch (Throwable x) {
@@ -69,7 +69,20 @@ public class HibernateUtil {
 	}
 	
 	
-
+    /**
+     * Use hibernate.cfg.xml (true) to create sessionfactory or bound
+     * sessionfactory to JNDI (false)
+     */
+    public  void setOfflineMode(boolean mode)
+    {
+    	if (mode==true)
+    	    log.debug("HibernateUtil.setOfflineMode() - Setting mode to hibernate.cfg.xml .");
+    	else
+    		log.debug("HibernateUtil.setOfflineMode() - Setting mode to JNDI.");
+    	
+        offlineMode = mode;
+    }
+    
     
         /**
 	 * Returns the SessionFactory used for this  class. If offlineMode has
@@ -80,6 +93,7 @@ public class HibernateUtil {
 	 */
 	public  SessionFactory getSessionFactory() {
 		if (sessionFactory == null) {
+			if (offlineMode == true) {
 				log.debug("HibernateUtil.getSessionFactory() - Using hibernate.cfg.xml to create a SessionFactory");
 				try {
 					configuration = new Configuration();
@@ -88,6 +102,15 @@ public class HibernateUtil {
 					throw new InfrastructureException("HibernateUtil.getSessionFactory() - Error creating SessionFactory with hibernate.cfg.xml .",x);
 				}
 				
+			} else {
+				log.debug("HibernateUtil.getSessionFactory() - Using JDNI to create a SessionFactory");
+				try {
+					Context ctx = new InitialContext();
+					sessionFactory = (SessionFactory) ctx.lookup(JNDI_SESSIONFACTORY);
+				} catch (NamingException x) {
+					throw new InfrastructureException("HibernateUtil.getSessionFactory() - Error creating JNDI-SessionFactory.",x);
+				}
+			}
 		}
 
 		if (sessionFactory == null) {
@@ -112,25 +135,25 @@ public class HibernateUtil {
 	 * 
 	 * @return Configuration
 	 */
-//	public  Configuration getConfiguration() {
-//		return configuration;
-//	}
+	public  Configuration getConfiguration() {
+		return configuration;
+	}
 
 	
         /**
 	 * Rebuild the SessionFactory with the  Configuration.
 	 * 
 	 */
-//	public  void rebuildSessionFactory() throws InfrastructureException {
-//		log.debug("HibernateUtil.rebuildSessionFactory() - Rebuilding the SessionFactory with the  Configuration.");
-//		synchronized (sessionFactory) {
-//			try {
-//				sessionFactory = getConfiguration().buildSessionFactory();
-//			} catch (Exception x) {
-//				throw new InfrastructureException("HibernateUtil.rebuildSessionFactory() - Error rebuilding SessionFactory with the  Configuration",x);
-//			}
-//		}
-//	}
+	public  void rebuildSessionFactory() throws InfrastructureException {
+		log.debug("HibernateUtil.rebuildSessionFactory() - Rebuilding the SessionFactory with the  Configuration.");
+		synchronized (sessionFactory) {
+			try {
+				sessionFactory = getConfiguration().buildSessionFactory();
+			} catch (Exception x) {
+				throw new InfrastructureException("HibernateUtil.rebuildSessionFactory() - Error rebuilding SessionFactory with the  Configuration",x);
+			}
+		}
+	}
 
   
         /**
@@ -138,20 +161,20 @@ public class HibernateUtil {
 	 * 
 	 * @param cfg
 	 */
-//	public  void rebuildSessionFactory(Configuration cfg) throws InfrastructureException {
-//		log.debug("HibernateUtil.rebuildSessionFactory() - Rebuilding the SessionFactory from the given Hibernate Configuration.");
-//		synchronized (sessionFactory) {
-//			try {
-//				if (sessionFactory != null && !sessionFactory.isClosed())
-//					sessionFactory.close();
-//
-//				sessionFactory = cfg.buildSessionFactory();
-//				configuration = cfg;
-//			} catch (Exception x) {
-//				throw new InfrastructureException("HibernateUtil.rebuildSessionFactory() - Error rebuilding the SessionFactory with the given Hibernate Configuration",x);
-//			}
-//		}
-//	}
+	public  void rebuildSessionFactory(Configuration cfg) throws InfrastructureException {
+		log.debug("HibernateUtil.rebuildSessionFactory() - Rebuilding the SessionFactory from the given Hibernate Configuration.");
+		synchronized (sessionFactory) {
+			try {
+				if (sessionFactory != null && !sessionFactory.isClosed())
+					sessionFactory.close();
+
+				sessionFactory = cfg.buildSessionFactory();
+				configuration = cfg;
+			} catch (Exception x) {
+				throw new InfrastructureException("HibernateUtil.rebuildSessionFactory() - Error rebuilding the SessionFactory with the given Hibernate Configuration",x);
+			}
+		}
+	}
   
   
         /**
@@ -165,7 +188,6 @@ public class HibernateUtil {
 		synchronized (sessionFactory) {
 			try {
 				log.debug("HibernateUtil.closeSessionFactory() - Destroy the current SessionFactory.");
-				disconnectSession();
 				sessionFactory.close();
 				// Clear  variables
 				configuration = null;
@@ -189,9 +211,12 @@ public class HibernateUtil {
 		try {
 			if (s == null) {
 				log.debug("HibernateUtil.getSession() - Opening new Session for this thread.");
-
-				s = getSessionFactory().openSession();
-				
+				if (getInterceptor() != null) {
+					log.debug("HibernateUtil.getSession() - Using interceptor: "+ getInterceptor().getClass());
+					s = getSessionFactory().openSession(getInterceptor());
+				} else {
+					s = getSessionFactory().openSession();
+				}
 				threadSession.set(s);
 			}
 		} catch (HibernateException x) {
@@ -226,8 +251,7 @@ public class HibernateUtil {
 		try {
 			if (tx == null) {
 				log.debug("HibernateUtil.beginTransaction() - Starting new database transaction in this thread.");
-				final Session session = getSession();
-				tx = session.beginTransaction();
+				tx = getSession().beginTransaction();
 				threadTransaction.set(tx);
 			}
 		} catch (HibernateException x) {
@@ -281,7 +305,7 @@ public class HibernateUtil {
 	public  void reconnect(Session session) throws InfrastructureException {
 		log.debug("HibernateUtil.reconnect() - Reconnecting Hibernate Session to the current Thread.");
 		try {
-			//session.reconnect(session.connection());
+			session.reconnect(session.connection());
 			threadSession.set(session);
 		} catch (HibernateException x) {
 			throw new InfrastructureException("HibernateUtil.reconnect() - Error reconnectin to the given session.",x);
@@ -316,9 +340,9 @@ public class HibernateUtil {
 	 * Has no effect if the current Session of the thread is already open,
 	 * effective on next close()/getSession().
 	 */
-//	public  void registerInterceptor(Interceptor interceptor) {
-//		threadInterceptor.set(interceptor);
-//	}
+	public  void registerInterceptor(Interceptor interceptor) {
+		threadInterceptor.set(interceptor);
+	}
 
 
         /**
@@ -326,19 +350,19 @@ public class HibernateUtil {
 	 * 
 	 * @return Interceptor
 	 */
-//	private  Interceptor getInterceptor() {
-//		Interceptor interceptor = (Interceptor) threadInterceptor.get();
-//		return interceptor;
-//	}
+	private  Interceptor getInterceptor() {
+		Interceptor interceptor = (Interceptor) threadInterceptor.get();
+		return interceptor;
+	}
   
   
         /**
 	 * Resets global interceptor to default state.
 	 */
-//	public  void resetInterceptor() {
-//		log.debug("HibernateUtil.resetInterceptor() - Resetting global interceptor to configuration setting");
-//		setInterceptor(configuration, null);
-//	}
+	public  void resetInterceptor() {
+		log.debug("HibernateUtil.resetInterceptor() - Resetting global interceptor to configuration setting");
+		setInterceptor(configuration, null);
+	}
 
   
         /**

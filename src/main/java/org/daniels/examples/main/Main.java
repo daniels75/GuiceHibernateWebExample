@@ -4,7 +4,6 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.daniels.examples.controller.OrdersController;
 import org.daniels.examples.dao.impl.HibernateConnection;
 import org.daniels.examples.dao.impl.OrdersDAO;
 import org.daniels.examples.model.Article;
@@ -42,33 +41,18 @@ public class Main {
         Injector injector = Guice.createInjector(new Module[]{module}); 
         
         firstCreate(injector);
-        //secondCreate(injector);
+        secondCreate(injector);
     }
     
     public static void firstCreate(Injector injector){
-        /**
-         * The injector injects our controller instance with its dependencies.
-         * Our OrdersDAO-instance will be now created.
-         */
-        OrdersController ordersController = new OrdersController();
-        injector.injectMembers(ordersController);
+
         /**
          * Here we use the Factory to create a HibernateConnection (with its 
          * HibernateUtil-reference) instance.
          */
         HibernateConnection connection = injector.getInstance(HibernateConnection.class); 
         connection.connect(); // initialize HibernateUtil
-        /**
-         * Retrieve the previously created instance.
-         */
-        OrdersDAO dao = ordersController.getOrdersDAO();
-        
-        
-        /**
-         * Link the HibernateConnection-instance to the OrderDAO-instance.
-         * OrderDAO needs this reference to the HibernateUtil.
-         */
-        dao.setConnection(connection);
+
         
         
         /**
@@ -92,6 +76,18 @@ public class Main {
         order1.setArticle(article1);
         order1.setCustomer(customer1);
         
+        
+        /**
+         * Retrieve the previously created instance.
+         */
+        OrdersDAO dao = injector.getInstance(OrdersDAO.class); 
+        
+        
+        /**
+         * Link the HibernateConnection-instance to the OrderDAO-instance.
+         * OrderDAO needs this reference to the HibernateUtil.
+         */
+        dao.setConnection(connection);
         /**
          * Let OrderDAO handle the persistence.
          */
@@ -114,13 +110,8 @@ public class Main {
          */
         
         
-        /**
-         * Create a new OrdersController but retrieve the same old OrdersDAO-Instance
-         * as in line 44 (singleton).
-         */
-        OrdersController ordersController2 = new OrdersController();
-        injector.injectMembers(ordersController2);
-        OrdersDAO dao2 = ordersController2.getOrdersDAO();
+ 
+    
         
         
         /**
@@ -151,6 +142,8 @@ public class Main {
         HibernateConnection connection2 = injector.getInstance(HibernateConnection.class); 
         
         connection2.connect(); // reconnect to database 
+        
+        OrdersDAO dao2 =  injector.getInstance(OrdersDAO.class); 
         dao2.setConnection(connection2);
         
         dao2.makePersistent(order2);

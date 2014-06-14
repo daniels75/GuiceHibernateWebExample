@@ -21,7 +21,7 @@ public class HibernateConnection implements IConnection<Session>{
     }
     
     public void connect() {
-       hibernateUtil.Configure(true);
+       hibernateUtil.configure();
        hibernateUtil.beginTransaction();
     }
 

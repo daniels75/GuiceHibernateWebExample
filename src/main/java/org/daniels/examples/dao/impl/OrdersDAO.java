@@ -84,7 +84,7 @@ public class OrdersDAO implements IGenericDAO<Orders> {
         Collection collections;
         try {
 
-            Session session = (Session) this.getConnection().getSession();
+            Session session = this.getConnection().getSession();
             collections = session.createCriteria(Orders.class).list();
             
             this.getConnection().commitTransaction();
@@ -114,7 +114,7 @@ public class OrdersDAO implements IGenericDAO<Orders> {
      * @return
      * @throws org.daniels.examples.exceptions.InfrastructureException
      */
-    public IConnection getConnection() throws InfrastructureException {
+    public IConnection<Session> getConnection() throws InfrastructureException {
         return this.connection;
     }
     
