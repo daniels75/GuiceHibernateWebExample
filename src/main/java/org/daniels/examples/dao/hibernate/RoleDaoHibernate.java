@@ -44,7 +44,8 @@ public class RoleDaoHibernate extends GenericDaoHibernate<Role, Long> implements
      */
     public void removeRole(String rolename) {
         Object role = getRoleByName(rolename);
-        Session session = getSessionFactory().getCurrentSession();
+        //Session session = getSessionFactory().getCurrentSession();
+        Session session = getSession();
         session.delete(role);
     }
 }

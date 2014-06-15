@@ -48,9 +48,10 @@ public class GenericDaoHibernate<T, PK extends Serializable> implements GenericD
      */
     protected final Log log = LogFactory.getLog(getClass());
     private Class<T> persistentClass;
-    @Resource
-    private SessionFactory sessionFactory;
-    private HibernateConnection hibernateConnection;
+//    @Resource
+//    private SessionFactory sessionFactory;
+//    private HibernateConnection hibernateConnection;
+    private Session session;
 
     /**
      * Constructor that takes in a class to see which type of entity to persist.
@@ -70,31 +71,36 @@ public class GenericDaoHibernate<T, PK extends Serializable> implements GenericD
      */
     public GenericDaoHibernate(final Class<T> persistentClass, SessionFactory sessionFactory) {
         this.persistentClass = persistentClass;
-        this.sessionFactory = sessionFactory;
+        //this.sessionFactory = sessionFactory;
     }
 
-    public SessionFactory getSessionFactory() {
-        return this.sessionFactory;
-    }
+//    public SessionFactory getSessionFactory() {
+//        return this.sessionFactory;
+//    }
 
     public Session getSession() throws HibernateException {
         // FIXME !!! Session sess = getSessionFactory().getCurrentSession();
-        Session sess = hibernateConnection.getSession();
-        if (sess == null) {
-            sess = getSessionFactory().openSession();
-        }
-        return sess;
+//        Session sess = hibernateConnection.getSession();
+//        if (sess == null) {
+//            sess = getSessionFactory().openSession();
+//        }
+//        return sess;
+        return session;
     }
 
-    @Autowired
-    @Required
-    public void setSessionFactory(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
+//    @Autowired
+//    @Required
+//    public void setSessionFactory(SessionFactory sessionFactory) {
+//        this.sessionFactory = sessionFactory;
+//    }
+
+    public void setSession(Session session) {
+        this.session = session;
     }
 
-    public void setHibernateConnection(final HibernateConnection hibernateConnection){
-        this.hibernateConnection = hibernateConnection;
-    }
+    //    public void setHibernateConnection(final HibernateConnection hibernateConnection){
+//        this.hibernateConnection = hibernateConnection;
+//    }
     /**
      * {@inheritDoc}
      */

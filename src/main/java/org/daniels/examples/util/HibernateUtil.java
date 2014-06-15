@@ -128,19 +128,21 @@ public class HibernateUtil {
 	 * @return Session
 	 */
 	public  Session getSession() throws InfrastructureException {
-		Session s = (Session) threadSession.get();
+		Session session = (Session) threadSession.get();
 		try {
-			if (s == null) {
+			if (session == null) {
 				log.debug("HibernateUtil.getSession() - Opening new Session for this thread.");
 
-				s = getSessionFactory().openSession();
+				//session = getSessionFactory().openSession();
+				session = getSessionFactory().getCurrentSession();
 				
-				threadSession.set(s);
+				
+				threadSession.set(session);
 			}
 		} catch (HibernateException x) {
 			throw new InfrastructureException("HibernateUtil.getSession() - Error retrieving/creating a session.",x);
 		}
-		return s;
+		return session;
 	}
 
   

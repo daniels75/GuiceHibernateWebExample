@@ -32,8 +32,9 @@ public class DaoHibernateMain {
         final Role role = new Role("Daniels", "Daniels Role Tester");
         
         final RoleDaoHibernate roleDao = new RoleDaoHibernate();
-        roleDao.setSessionFactory(connection.getSessionFactory());
-        roleDao.setHibernateConnection(connection);
+        //roleDao.setSessionFactory(connection.getSessionFactory());
+        //roleDao.setHibernateConnection(connection);
+        roleDao.setSession(connection.getSession());
         
         roleDao.save(role);
         
