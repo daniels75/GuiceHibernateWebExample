@@ -3,6 +3,7 @@ package org.daniels.examples.dao.impl;
 import org.daniels.examples.dao.IConnection;
 import org.daniels.examples.util.HibernateUtil;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 
 /**
  * Wrapper-class for OrdersDAO (and all other DAO's). 
@@ -31,6 +32,10 @@ public class HibernateConnection implements IConnection<Session>{
 
     public Session getSession() {
         return hibernateUtil.getSession();
+    }
+    
+    public SessionFactory getSessionFactory() {
+        return hibernateUtil.getSessionFactory();
     }
 
     public void rollbackTransaction() {

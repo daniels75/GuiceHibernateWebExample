@@ -20,7 +20,8 @@
 		<mapping resource="Article.hbm.xml" />
 		<mapping resource="Customer.hbm.xml" />
 		<mapping resource="Orders.hbm.xml" />
-
+      	<mapping class="org.daniels.examples.model.Role"/>
+      
 	</session-factory>
 </hibernate-configuration>
 

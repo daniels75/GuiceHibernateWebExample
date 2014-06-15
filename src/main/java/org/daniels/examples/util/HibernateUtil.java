@@ -96,53 +96,6 @@ public class HibernateUtil {
 		this.sessionFactory = sessionFactory;
 	}
 
-
-        /**
-	 * Returns the original Hibernate configuration.
-	 * 
-	 * @return Configuration
-	 */
-//	public  Configuration getConfiguration() {
-//		return configuration;
-//	}
-
-	
-        /**
-	 * Rebuild the SessionFactory with the  Configuration.
-	 * 
-	 */
-//	public  void rebuildSessionFactory() throws InfrastructureException {
-//		log.debug("HibernateUtil.rebuildSessionFactory() - Rebuilding the SessionFactory with the  Configuration.");
-//		synchronized (sessionFactory) {
-//			try {
-//				sessionFactory = getConfiguration().buildSessionFactory();
-//			} catch (Exception x) {
-//				throw new InfrastructureException("HibernateUtil.rebuildSessionFactory() - Error rebuilding SessionFactory with the  Configuration",x);
-//			}
-//		}
-//	}
-
-  
-        /**
-	 * Rebuild the SessionFactory with the given Hibernate Configuration.
-	 * 
-	 * @param cfg
-	 */
-//	public  void rebuildSessionFactory(Configuration cfg) throws InfrastructureException {
-//		log.debug("HibernateUtil.rebuildSessionFactory() - Rebuilding the SessionFactory from the given Hibernate Configuration.");
-//		synchronized (sessionFactory) {
-//			try {
-//				if (sessionFactory != null && !sessionFactory.isClosed())
-//					sessionFactory.close();
-//
-//				sessionFactory = cfg.buildSessionFactory();
-//				configuration = cfg;
-//			} catch (Exception x) {
-//				throw new InfrastructureException("HibernateUtil.rebuildSessionFactory() - Error rebuilding the SessionFactory with the given Hibernate Configuration",x);
-//			}
-//		}
-//	}
-  
   
         /**
 	 * Destroy this SessionFactory and release all resources (caches, connection

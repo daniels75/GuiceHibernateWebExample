@@ -50,7 +50,7 @@
 						<drop>true</drop>
 						<jdk5>true</jdk5>
 						<propertyfile>target/test-classes/jdbc.properties</propertyfile>
-						<configurationfile>src/test/resources/hibernate-test.cfg.xml</configurationfile>
+						<configurationfile>src/main/resources/hibernate.cfg.xml</configurationfile>
 						<skip>${skipTests}</skip>
 					</componentProperties>
 				</configuration>
@@ -290,7 +290,11 @@
         </dependency>
 		
 		
-		
+	        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${commons.lang.version}</version>
+        </dependency>	
 		
     </dependencies>
     
@@ -315,7 +319,7 @@
 		<jdbc.version>5.1.27</jdbc.version>
 		<jdbc.driverClassName>com.mysql.jdbc.Driver</jdbc.driverClassName>
 		<jdbc.url>
-            <![CDATA[jdbc:mysql://localhost/guicespringexample?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf-8&amp;autoReconnect=true]]>
+            <![CDATA[jdbc:mysql://localhost/hibernateguicetest?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf-8&amp;autoReconnect=true]]>
 		</jdbc.url>
 		<jdbc.username>root</jdbc.username>
 		<jdbc.password>wodna33</jdbc.password>
@@ -323,7 +327,7 @@
 		<!-- needed for jdbc.properties file -->
 		<jdbc.validationQuery><![CDATA[SELECT 1 + 1]]></jdbc.validationQuery>
 		<hibernate.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</hibernate.dialect>		 
-		 
+		 <commons.lang.version>2.6</commons.lang.version>
     </properties>
 	
 </project>
