@@ -23,6 +23,8 @@ import org.hibernate.IdentifierLoadAccess;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import com.google.inject.Inject;
+
 
 /**
  * This class serves as the Base class for all other DAOs - namely to hold
@@ -49,6 +51,7 @@ public class GenericDaoHibernate<T, PK extends Serializable> implements GenericD
     protected final Log log = LogFactory.getLog(getClass());
     private Class<T> persistentClass;
 //    @Resource
+    @Inject
     private SessionFactory sessionFactory;
 //    private HibernateConnection hibernateConnection;
     private Session session;
@@ -86,8 +89,9 @@ public class GenericDaoHibernate<T, PK extends Serializable> implements GenericD
         return session;
     }
 
-    @Autowired
-    @Required
+//    @Autowired
+//    @Required
+    //@Inject
     public void setSessionFactory(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }

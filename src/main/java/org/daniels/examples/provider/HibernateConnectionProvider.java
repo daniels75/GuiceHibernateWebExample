@@ -1,7 +1,9 @@
 package org.daniels.examples.provider;
 
+import org.daniels.examples.dao.HibernateConnection;
 import org.daniels.examples.dao.impl.HibernateConnectionImpl;
 import org.daniels.examples.hibernate.util.HibernateUtil;
+import org.hibernate.Session;
 
 import com.google.inject.Provider;
 
@@ -23,7 +25,6 @@ public class HibernateConnectionProvider implements Provider<HibernateConnection
     HibernateConnectionProvider(HibernateUtil hibernateUtil) {
         this.hibernateUtil = hibernateUtil;
     }    
-    
     
     public HibernateConnectionImpl get() {
         HibernateConnectionImpl connection = new HibernateConnectionImpl(hibernateUtil);

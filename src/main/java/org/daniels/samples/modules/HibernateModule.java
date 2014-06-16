@@ -1,7 +1,10 @@
 package org.daniels.samples.modules;
 
+import org.daniels.examples.dao.HibernateConnection;
 import org.daniels.examples.dao.impl.HibernateConnectionImpl;
 import org.daniels.examples.provider.HibernateConnectionProvider;
+import org.daniels.examples.provider.SessionFactoryProvider;
+import org.hibernate.SessionFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
@@ -21,7 +24,10 @@ public class HibernateModule extends AbstractModule{
          * HibernateConnection connection = injector.getInstance(HibernateConnection.class); 
          * a new Instance of HibernateConnection (with the included HibernateUtil) will be created.
          */
+        
+        bind(SessionFactory.class).toProvider(SessionFactoryProvider.class).in(Scopes.SINGLETON);
         bind(HibernateConnectionImpl.class).toProvider(HibernateConnectionProvider.class).in(Scopes.SINGLETON);
+        
        
     } 
     

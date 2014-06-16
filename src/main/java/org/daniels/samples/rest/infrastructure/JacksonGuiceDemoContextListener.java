@@ -1,6 +1,7 @@
 package org.daniels.samples.rest.infrastructure;
 
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
+import org.daniels.samples.modules.HibernateModule;
 import org.daniels.samples.modules.UserModule;
 
 import com.google.inject.Guice;
@@ -35,6 +36,6 @@ public class JacksonGuiceDemoContextListener extends GuiceServletContextListener
                 serve("/web/*").with(GuiceContainer.class);
 
             }
-        }, new UserModule());
+        }, new UserModule(), new HibernateModule());
     }
 }

@@ -8,6 +8,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.daniels.examples.exceptions.InfrastructureException;
 
+import com.google.inject.Inject;
+
 import javax.naming.*;
 
 /**
@@ -21,6 +23,7 @@ public class HibernateUtil {
     private static final Log logger = LogFactory.getLog(HibernateUtil.class);
 
     private Configuration configuration;
+    @Inject
     private SessionFactory sessionFactory;
     private final ThreadLocal threadSession = new ThreadLocal();
     private final ThreadLocal threadTransaction = new ThreadLocal();
@@ -39,28 +42,29 @@ public class HibernateUtil {
     }
 
     public SessionFactory getSessionFactory() {
-        if (sessionFactory == null) {
-            try {
-                final Configuration configuration = new Configuration();
-                configuration.configure(HIBERNATE_CFG_XML);
-                logger.debug("Hibernate Annotation Configuration loaded");
-
-                ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(
-                        configuration.getProperties()).build();
-                logger.debug("Hibernate Annotation serviceRegistry created");
-
-                sessionFactory = configuration.buildSessionFactory(serviceRegistry);
-
-                return sessionFactory;
-            } catch (Throwable ex) {
-                logger.error("Initial SessionFactory creation failed." + ex);
-                throw new ExceptionInInitializerError(ex);
-            }
-        }
-
-        if (sessionFactory == null) {
-            throw new IllegalStateException("SessionFactory not available.");
-        }
+        // sessionFactory provided by Injection
+//        if (sessionFactory == null) {
+//            try {
+//                final Configuration configuration = new Configuration();
+//                configuration.configure(HIBERNATE_CFG_XML);
+//                logger.debug("Hibernate Annotation Configuration loaded");
+//
+//                ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(
+//                        configuration.getProperties()).build();
+//                logger.debug("Hibernate Annotation serviceRegistry created");
+//
+//                sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+//
+//                return sessionFactory;
+//            } catch (Throwable ex) {
+//                logger.error("Initial SessionFactory creation failed." + ex);
+//                throw new ExceptionInInitializerError(ex);
+//            }
+//        }
+//
+//        if (sessionFactory == null) {
+//            throw new IllegalStateException("SessionFactory not available.");
+//        }
 
         return sessionFactory;
 

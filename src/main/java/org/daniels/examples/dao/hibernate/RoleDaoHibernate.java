@@ -4,25 +4,21 @@ import java.util.List;
 
 import org.daniels.examples.dao.RoleDao;
 import org.daniels.examples.model.Role;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.stereotype.Repository;
 
 
 /**
  * This class interacts with hibernate session to save/delete and
  * retrieve Role objects.
- *
- * @author <a href="mailto:bwnoll@gmail.com">Bryan Noll</a>
- * @author jgarcia (updated to hibernate 4)
- */
-@Repository
+*/
+
 public class RoleDaoHibernate extends GenericDaoHibernate<Role, Long> implements RoleDao {
 
     /**
      * Constructor to create a Generics-based version using Role as the entity
      */
+    
     public RoleDaoHibernate() {
         super(Role.class);
     }

@@ -28,6 +28,10 @@ public class HibernateConnectionImpl implements HibernateConnection<Session>{
         hibernateUtil.closeSessionFactory();
     }
 
+    public void setSessionFactory(SessionFactory sessionFactory){
+        hibernateUtil.setSessionFactory(sessionFactory);
+    }
+    
     public Session getSession() {
         return hibernateUtil.getSession();
     }
