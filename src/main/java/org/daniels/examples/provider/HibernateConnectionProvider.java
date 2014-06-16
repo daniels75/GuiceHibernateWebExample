@@ -17,7 +17,7 @@ import com.google.inject.Inject;
  * HibernateUtil-instance (as singleton, defined in class GuiceModule). 
  * 
  */
-public class HibernateConnectionProvider implements Provider<HibernateConnectionImpl>{
+public class HibernateConnectionProvider implements Provider<HibernateConnection<Session>>{
 
     private final HibernateUtil hibernateUtil;
     
@@ -26,8 +26,8 @@ public class HibernateConnectionProvider implements Provider<HibernateConnection
         this.hibernateUtil = hibernateUtil;
     }    
     
-    public HibernateConnectionImpl get() {
-        HibernateConnectionImpl connection = new HibernateConnectionImpl(hibernateUtil);
+    public HibernateConnection<Session> get() {
+        HibernateConnection<Session> connection = new HibernateConnectionImpl(hibernateUtil);
         return connection;
     }
 

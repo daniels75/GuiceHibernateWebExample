@@ -1,5 +1,7 @@
 package org.daniels.examples.dao;
 
+import org.hibernate.SessionFactory;
+
 /**
  * Interface for creating Database-Connection-Wrappers.
  * 
@@ -17,5 +19,7 @@ public interface HibernateConnection<T> {
     public void commitTransaction();
     
     public void closeSession();
+    SessionFactory getSessionFactory();
+    void beginTransaction();
     
 }

@@ -1,13 +1,18 @@
 package org.daniels.samples.modules;
 
 import org.daniels.examples.dao.HibernateConnection;
+import org.daniels.examples.dao.RoleDao;
+import org.daniels.examples.dao.hibernate.RoleDaoHibernate;
 import org.daniels.examples.dao.impl.HibernateConnectionImpl;
 import org.daniels.examples.provider.HibernateConnectionProvider;
 import org.daniels.examples.provider.SessionFactoryProvider;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Scope;
 import com.google.inject.Scopes;
+import com.google.inject.TypeLiteral;
 
 
 /**
@@ -26,9 +31,10 @@ public class HibernateModule extends AbstractModule{
          */
         
         bind(SessionFactory.class).toProvider(SessionFactoryProvider.class).in(Scopes.SINGLETON);
-        bind(HibernateConnectionImpl.class).toProvider(HibernateConnectionProvider.class).in(Scopes.SINGLETON);
-        
-       
+        //bind(HibernateConnection.class).toProvider(HibernateConnectionProvider.class).in(Scopes.SINGLETON);
+        bind(new TypeLiteral<HibernateConnection<Session>>(){}).toProvider(HibernateConnectionProvider.class).in(Scopes.SINGLETON);;
+
+        bind(RoleDao.class).to(RoleDaoHibernate.class);
     } 
     
 }

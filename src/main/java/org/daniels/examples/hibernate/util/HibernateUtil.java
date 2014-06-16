@@ -109,7 +109,7 @@ public class HibernateUtil {
      */
     public Session getSession() throws HibernateException {
         Session session = (Session) threadSession.get();
-        if (session == null) {
+        if (session == null || !session.isOpen()) {
             logger.debug("Opening new Session for this thread.");
 
             session = getSessionFactory().getCurrentSession();
