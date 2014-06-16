@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.daniels.examples.dao.IConnection;
+import org.daniels.examples.dao.HibernateConnection;
 import org.daniels.examples.dao.IGenericDAO;
 import org.daniels.examples.exceptions.InfrastructureException;
 import org.daniels.examples.model.Orders;
@@ -25,7 +25,7 @@ public class OrdersDAO implements IGenericDAO<Orders> {
     private int counter=0; // remove if not needed.
     
     private Log logger = LogFactory.getLog(OrdersDAO.class);
-    private HibernateConnection connection;
+    private HibernateConnectionImpl connection;
 
 
     public void makePersistent(Orders orders) throws InfrastructureException {
@@ -104,8 +104,8 @@ public class OrdersDAO implements IGenericDAO<Orders> {
      * @param connection
      * @throws org.daniels.examples.exceptions.InfrastructureException
      */
-    public void setConnection(IConnection connection) throws InfrastructureException {
-        this.connection = (HibernateConnection) connection;
+    public void setConnection(HibernateConnection connection) throws InfrastructureException {
+        this.connection = (HibernateConnectionImpl) connection;
     }
 
     /**
@@ -114,7 +114,7 @@ public class OrdersDAO implements IGenericDAO<Orders> {
      * @return
      * @throws org.daniels.examples.exceptions.InfrastructureException
      */
-    public IConnection<Session> getConnection() throws InfrastructureException {
+    public HibernateConnection<Session> getConnection() throws InfrastructureException {
         return this.connection;
     }
     

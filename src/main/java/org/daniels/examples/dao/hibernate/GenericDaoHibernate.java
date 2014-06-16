@@ -3,7 +3,7 @@ package org.daniels.examples.dao.hibernate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.daniels.examples.dao.GenericDao;
-import org.daniels.examples.dao.impl.HibernateConnection;
+import org.daniels.examples.dao.impl.HibernateConnectionImpl;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
@@ -49,7 +49,7 @@ public class GenericDaoHibernate<T, PK extends Serializable> implements GenericD
     protected final Log log = LogFactory.getLog(getClass());
     private Class<T> persistentClass;
 //    @Resource
-//    private SessionFactory sessionFactory;
+    private SessionFactory sessionFactory;
 //    private HibernateConnection hibernateConnection;
     private Session session;
 
@@ -74,25 +74,23 @@ public class GenericDaoHibernate<T, PK extends Serializable> implements GenericD
         //this.sessionFactory = sessionFactory;
     }
 
-//    public SessionFactory getSessionFactory() {
-//        return this.sessionFactory;
-//    }
+    public SessionFactory getSessionFactory() {
+        return this.sessionFactory;
+    }
 
     public Session getSession() throws HibernateException {
-        // FIXME !!! Session sess = getSessionFactory().getCurrentSession();
-//        Session sess = hibernateConnection.getSession();
-//        if (sess == null) {
-//            sess = getSessionFactory().openSession();
-//        }
-//        return sess;
+        Session session = getSessionFactory().getCurrentSession();
+        if (session == null) {
+            session = getSessionFactory().openSession();
+        }
         return session;
     }
 
-//    @Autowired
-//    @Required
-//    public void setSessionFactory(SessionFactory sessionFactory) {
-//        this.sessionFactory = sessionFactory;
-//    }
+    @Autowired
+    @Required
+    public void setSessionFactory(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
     public void setSession(Session session) {
         this.session = session;
@@ -154,8 +152,8 @@ public class GenericDaoHibernate<T, PK extends Serializable> implements GenericD
      */
     @SuppressWarnings("unchecked")
     public T save(T object) {
-        Session sess = getSession();
-        return (T) sess.merge(object);
+        Session session = getSession();
+        return (T) session.merge(object);
     }
 
     /**

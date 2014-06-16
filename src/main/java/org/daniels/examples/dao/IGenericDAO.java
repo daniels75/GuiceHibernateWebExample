@@ -10,10 +10,10 @@ import org.daniels.examples.exceptions.InfrastructureException;
  */
 public interface IGenericDAO<T> {
     
-    public void setConnection(IConnection connection)
+    public void setConnection(HibernateConnection connection)
         throws InfrastructureException;
     
-    public IConnection getConnection()
+    public HibernateConnection getConnection()
         throws InfrastructureException;    
     
     public void makePersistent(T var)

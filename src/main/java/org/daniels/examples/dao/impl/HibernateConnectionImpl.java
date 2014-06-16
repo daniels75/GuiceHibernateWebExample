@@ -1,32 +1,30 @@
 package org.daniels.examples.dao.impl;
 
-import org.daniels.examples.dao.IConnection;
-import org.daniels.examples.util.HibernateUtil;
+import org.daniels.examples.dao.HibernateConnection;
+import org.daniels.examples.hibernate.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 /**
  * Wrapper-class for OrdersDAO (and all other DAO's). 
- * If you want to use an other HibernateUtil, just change the
- * ConnectionProvider.class -Binding in GuiceModule or create
- * other Provider- and Connection classes.
- * 
- * @author Siegfried Bolz
  */
-public class HibernateConnection implements IConnection<Session>{
+public class HibernateConnectionImpl implements HibernateConnection<Session>{
 
     private HibernateUtil hibernateUtil;
     
-    public HibernateConnection(HibernateUtil hibernateUtil) {
+    public HibernateConnectionImpl(HibernateUtil hibernateUtil) {
         this.hibernateUtil = hibernateUtil;
     }
     
     public void connect() {
        hibernateUtil.configure();
-       hibernateUtil.beginTransaction();
+    }
+    
+    public void beginTransaction(){
+        hibernateUtil.beginTransaction();
     }
 
-    public void disConnect() {
+    public void closeSessionFactory() {
         hibernateUtil.closeSessionFactory();
     }
 
@@ -50,4 +48,4 @@ public class HibernateConnection implements IConnection<Session>{
         hibernateUtil.closeSession();
     }
     
-} // .EOF
+}

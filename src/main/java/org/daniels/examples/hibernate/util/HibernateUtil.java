@@ -1,117 +1,177 @@
 package org.daniels.examples.hibernate.util;
 
-import java.util.Properties;
-
-import org.daniels.examples.model.Employee1;
-import org.hibernate.SessionFactory;
+import org.hibernate.*;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.daniels.examples.exceptions.InfrastructureException;
 
+import javax.naming.*;
+
+/**
+ * Hibernate helper class, handles SessionFactory, Session and Transaction.
+ * 
+ */
 public class HibernateUtil {
 
-    // XML based configuration
-    private static SessionFactory sessionFactory;
+    private static final String HIBERNATE_CFG_XML = "hibernate.cfg.xml";
 
-    // Annotation based configuration
-    private static SessionFactory sessionAnnotationFactory;
+    private static final Log logger = LogFactory.getLog(HibernateUtil.class);
 
-    // Property based configuration
-    private static SessionFactory sessionJavaConfigFactory;
+    private Configuration configuration;
+    private SessionFactory sessionFactory;
+    private final ThreadLocal threadSession = new ThreadLocal();
+    private final ThreadLocal threadTransaction = new ThreadLocal();
 
-    private static SessionFactory buildSessionFactory() {
+    /**
+     * Create the initial SessionFactory from hibernate.xml.cfg
+     */
+    public void configure() {
+        logger.debug("Trying to initialize Hibernate.");
         try {
-            // Create the SessionFactory from hibernate.cfg.xml
-            Configuration configuration = new Configuration();
-            configuration.configure("hibernate.cfg.xml");
-            System.out.println("Hibernate Configuration loaded");
-
-            ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(
-                    configuration.getProperties()).build();
-            System.out.println("Hibernate serviceRegistry created");
-
-            SessionFactory sessionFactory = configuration.buildSessionFactory(serviceRegistry);
-
-            return sessionFactory;
-        } catch (Throwable ex) {
-            // Make sure you log the exception, as it might be swallowed
-            System.err.println("Initial SessionFactory creation failed." + ex);
-            throw new ExceptionInInitializerError(ex);
+            sessionFactory = getSessionFactory();
+        } catch (Throwable x) {
+            logger.error("Building SessionFactory failed.", x);
+            throw new ExceptionInInitializerError(x);
         }
     }
 
-    private static SessionFactory buildSessionAnnotationFactory() {
-        try {
-            // Create the SessionFactory from hibernate.cfg.xml
-            Configuration configuration = new Configuration();
-            configuration.configure("hibernate-annotation.cfg.xml");
-            System.out.println("Hibernate Annotation Configuration loaded");
-
-            ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(
-                    configuration.getProperties()).build();
-            System.out.println("Hibernate Annotation serviceRegistry created");
-
-            SessionFactory sessionFactory = configuration.buildSessionFactory(serviceRegistry);
-
-            return sessionFactory;
-        } catch (Throwable ex) {
-            // Make sure you log the exception, as it might be swallowed
-            System.err.println("Initial SessionFactory creation failed." + ex);
-            throw new ExceptionInInitializerError(ex);
-        }
-    }
-
-    private static SessionFactory buildSessionJavaConfigFactory() {
-        try {
-            Configuration configuration = new Configuration();
-
-            // Create Properties, can be read from property files too
-            Properties props = new Properties();
-            props.put("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");
-            props.put("hibernate.connection.url", "jdbc:mysql://localhost/guicespringexample");
-            props.put("hibernate.connection.username", "root");
-            props.put("hibernate.connection.password", "wodna33");
-            props.put("hibernate.current_session_context_class", "thread");
-
-            configuration.setProperties(props);
-
-            // we can set mapping file or class with annotation
-            // addClass(Employee1.class) will look for resource
-            // com/journaldev/hibernate/model/Employee1.hbm.xml (not good)
-            configuration.addAnnotatedClass(Employee1.class);
-
-            ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(
-                    configuration.getProperties()).build();
-            System.out.println("Hibernate Java Config serviceRegistry created");
-
-            SessionFactory sessionFactory = configuration.buildSessionFactory(serviceRegistry);
-
-            return sessionFactory;
-        } catch (Throwable ex) {
-            System.err.println("Initial SessionFactory creation failed." + ex);
-            throw new ExceptionInInitializerError(ex);
-        }
-    }
-
-    public static SessionFactory getSessionFactory() {
+    public SessionFactory getSessionFactory() {
         if (sessionFactory == null) {
-            sessionFactory = buildSessionFactory();
+            try {
+                final Configuration configuration = new Configuration();
+                configuration.configure(HIBERNATE_CFG_XML);
+                logger.debug("Hibernate Annotation Configuration loaded");
+
+                ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(
+                        configuration.getProperties()).build();
+                logger.debug("Hibernate Annotation serviceRegistry created");
+
+                sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+
+                return sessionFactory;
+            } catch (Throwable ex) {
+                logger.error("Initial SessionFactory creation failed." + ex);
+                throw new ExceptionInInitializerError(ex);
+            }
         }
+
+        if (sessionFactory == null) {
+            throw new IllegalStateException("SessionFactory not available.");
+        }
+
         return sessionFactory;
+
     }
 
-    public static SessionFactory getSessionAnnotationFactory() {
-        if (sessionAnnotationFactory == null) {
-            sessionAnnotationFactory = buildSessionAnnotationFactory();
-        }
-        return sessionAnnotationFactory;
+    /**
+     * Sets the given SessionFactory.
+     * 
+     * @param sessionFactory
+     */
+    public void setSessionFactory(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
-    public static SessionFactory getSessionJavaConfigFactory() {
-        if (sessionJavaConfigFactory == null) {
-            sessionJavaConfigFactory = buildSessionJavaConfigFactory();
+    /**
+     * Destroy this SessionFactory and release all resources (caches, connection pools, etc).
+     * 
+     */
+    public void closeSessionFactory() throws InfrastructureException {
+        synchronized (sessionFactory) {
+            try {
+                logger.debug("Destroy the current SessionFactory.");
+                closeSession();
+                sessionFactory.close();
+                // Clear variables
+                configuration = null;
+                sessionFactory = null;
+            } catch (Exception x) {
+                throw new InfrastructureException(
+                        "HibernateUtil.closeSessionFactory() - Error destroying the current SessionFactory", x);
+            }
         }
-        return sessionJavaConfigFactory;
+    }
+
+    /**
+     * Retrieves the current Session local to the thread.
+     * <p/>
+     * 
+     * If no Session is open, opens a new Session for the running thread.
+     * 
+     * @return Session
+     */
+    public Session getSession() throws HibernateException {
+        Session session = (Session) threadSession.get();
+        if (session == null) {
+            logger.debug("Opening new Session for this thread.");
+
+            session = getSessionFactory().getCurrentSession();
+            if (session == null) {
+                session = getSessionFactory().openSession();
+            }
+
+            threadSession.set(session);
+        }
+        return session;
+    }
+
+    /**
+     * Closes the Session local to the thread.
+     */
+    public void closeSession() throws HibernateException {
+        Session s = (Session) threadSession.get();
+        threadSession.set(null);
+        if (s != null && s.isOpen()) {
+            logger.debug("Closing Session of this thread.");
+            s.close();
+        }
+
+    }
+
+    /**
+     * Start a new database transaction.
+     */
+    public void beginTransaction() throws HibernateException {
+        Transaction transaction = (Transaction) threadTransaction.get();
+        if (transaction == null) {
+            logger.debug("Starting new database transaction in this thread.");
+            final Session session = getSession();
+            transaction = session.beginTransaction();
+            threadTransaction.set(transaction);
+        }
+
+    }
+
+    /**
+     * Commit the database transaction.
+     */
+    public void commitTransaction() throws HibernateException {
+        Transaction transaction = (Transaction) threadTransaction.get();
+        if (transaction != null && !transaction.wasCommitted() && !transaction.wasRolledBack()) {
+            logger.debug("Committing database transaction of this thread.");
+            transaction.commit();
+        }
+        threadTransaction.set(null);
+
+    }
+
+    /**
+     * Rollback the database transaction.
+     */
+    public void rollbackTransaction() throws HibernateException {
+        Transaction transaction = (Transaction) threadTransaction.get();
+        try {
+            threadTransaction.set(null);
+            if (transaction != null && !transaction.wasCommitted() && !transaction.wasRolledBack()) {
+                logger.debug("HibernateUtil.rollbackTransaction() - Tyring to rollback database transaction of this thread.");
+                transaction.rollback();
+            }
+        } finally {
+            closeSession();
+        }
     }
 
 }

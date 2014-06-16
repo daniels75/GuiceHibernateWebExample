@@ -1,7 +1,7 @@
 package org.daniels.examples.provider;
 
-import org.daniels.examples.dao.impl.HibernateConnection;
-import org.daniels.examples.util.HibernateUtil;
+import org.daniels.examples.dao.impl.HibernateConnectionImpl;
+import org.daniels.examples.hibernate.util.HibernateUtil;
 
 import com.google.inject.Provider;
 
@@ -14,21 +14,20 @@ import com.google.inject.Inject;
  * return HibernateConnection objects. Guice automatically injects a brand new
  * HibernateUtil-instance (as singleton, defined in class GuiceModule). 
  * 
- * @author Siegfried Bolz
  */
-public class ConnectionProvider implements Provider<HibernateConnection>{
+public class HibernateConnectionProvider implements Provider<HibernateConnectionImpl>{
 
     private final HibernateUtil hibernateUtil;
     
     @Inject
-    ConnectionProvider(HibernateUtil hibernateUtil) {
+    HibernateConnectionProvider(HibernateUtil hibernateUtil) {
         this.hibernateUtil = hibernateUtil;
     }    
     
     
-    public HibernateConnection get() {
-        HibernateConnection connection = new HibernateConnection(hibernateUtil);
+    public HibernateConnectionImpl get() {
+        HibernateConnectionImpl connection = new HibernateConnectionImpl(hibernateUtil);
         return connection;
     }
 
-} // .EOF
+}

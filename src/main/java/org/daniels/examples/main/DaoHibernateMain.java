@@ -4,7 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.daniels.examples.dao.RoleDao;
 import org.daniels.examples.dao.hibernate.RoleDaoHibernate;
-import org.daniels.examples.dao.impl.HibernateConnection;
+import org.daniels.examples.dao.impl.HibernateConnectionImpl;
 import org.daniels.examples.model.Role;
 import org.daniels.samples.modules.HibernateModule;
 
@@ -24,22 +24,41 @@ public class DaoHibernateMain {
 
         Injector injector = Guice.createInjector(new Module[]{module}); 
         
-        HibernateConnection connection = injector.getInstance(HibernateConnection.class); 
+        HibernateConnectionImpl connection = injector.getInstance(HibernateConnectionImpl.class); 
         
         
         connection.connect();
+        
+        
         
         final Role role = new Role("Daniels", "Daniels Role Tester");
         
         final RoleDaoHibernate roleDao = new RoleDaoHibernate();
         //roleDao.setSessionFactory(connection.getSessionFactory());
         //roleDao.setHibernateConnection(connection);
-        roleDao.setSession(connection.getSession());
+        roleDao.setSessionFactory(connection.getSessionFactory());
+        logger.info(">>> statistics: " + connection.getSessionFactory().getStatistics());
         
+        
+        connection.beginTransaction();
         roleDao.save(role);
-        
+        logger.info(">>> statistics: " + connection.getSessionFactory().getStatistics());
         connection.commitTransaction();
-        connection.disConnect();
+        //connection.disConnect();
+        connection.closeSession();
+        
+        
+        connection.beginTransaction();
+        roleDao.save(role);
+        logger.info(">>> statistics: " + connection.getSessionFactory().getStatistics());
+        connection.commitTransaction();
+        //connection.disConnect();
+        connection.closeSession();
+        
+        
+        connection.closeSessionFactory();
+        
+        
         
         
     }

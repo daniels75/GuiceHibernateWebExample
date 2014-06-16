@@ -17,10 +17,6 @@ import java.io.Serializable;
 /**
  * This class is used to represent available roles in the database.
  *
- * @author <a href="mailto:matt@raibledesigns.com">Matt Raible</a>
- *         Version by Dan Kibler dan@getrolling.com
- *         Extended to implement Acegi GrantedAuthority interface
- *         by David Carter david@carter.net
  */
 @Entity
 @Table(name = "role")

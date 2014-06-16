@@ -1,7 +1,7 @@
 package org.daniels.samples.modules;
 
-import org.daniels.examples.dao.impl.HibernateConnection;
-import org.daniels.examples.provider.ConnectionProvider;
+import org.daniels.examples.dao.impl.HibernateConnectionImpl;
+import org.daniels.examples.provider.HibernateConnectionProvider;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
@@ -10,7 +10,6 @@ import com.google.inject.Scopes;
 /**
  * Configuration-class for guice. Here are the bindings defined.
  * 
- * @author Siegfried Bolz
  */
 public class HibernateModule extends AbstractModule{
     
@@ -22,8 +21,8 @@ public class HibernateModule extends AbstractModule{
          * HibernateConnection connection = injector.getInstance(HibernateConnection.class); 
          * a new Instance of HibernateConnection (with the included HibernateUtil) will be created.
          */
-        bind(HibernateConnection.class).toProvider(ConnectionProvider.class).in(Scopes.SINGLETON);
+        bind(HibernateConnectionImpl.class).toProvider(HibernateConnectionProvider.class).in(Scopes.SINGLETON);
        
     } 
     
-} // .EOF
+}

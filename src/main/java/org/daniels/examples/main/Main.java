@@ -4,7 +4,7 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.daniels.examples.dao.impl.HibernateConnection;
+import org.daniels.examples.dao.impl.HibernateConnectionImpl;
 import org.daniels.examples.dao.impl.OrdersDAO;
 import org.daniels.examples.model.Article;
 import org.daniels.examples.model.Customer;
@@ -50,7 +50,7 @@ public class Main {
          * Here we use the Factory to create a HibernateConnection (with its 
          * HibernateUtil-reference) instance.
          */
-        HibernateConnection connection = injector.getInstance(HibernateConnection.class); 
+        HibernateConnectionImpl connection = injector.getInstance(HibernateConnectionImpl.class); 
         connection.connect(); // initialize HibernateUtil
 
         
@@ -101,7 +101,7 @@ public class Main {
         /**
          * Close Hibernate SessionFactory and all sessions.
          */
-        connection.disConnect(); 
+        connection.closeSessionFactory(); 
         
     }
     public static void secondCreate(Injector injector){
@@ -139,7 +139,7 @@ public class Main {
         /**
          * Retrieves the same old HibernateConnection-Instance as in line 52 (singleton!).
          */
-        HibernateConnection connection2 = injector.getInstance(HibernateConnection.class); 
+        HibernateConnectionImpl connection2 = injector.getInstance(HibernateConnectionImpl.class); 
         
         connection2.connect(); // reconnect to database 
         
@@ -156,7 +156,7 @@ public class Main {
          */
         //logger.info("****** Number of orders in database: " + dao.findAll().size());
         
-        connection2.disConnect(); // finish connection    	
+        connection2.closeSessionFactory(); // finish connection    	
     }
 
 } // .EOF

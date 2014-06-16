@@ -3,13 +3,12 @@ package org.daniels.examples.dao;
 /**
  * Interface for creating Database-Connection-Wrappers.
  * 
- * @author Siegfried Bolz
  */
-public interface IConnection<T> {
+public interface HibernateConnection<T> {
 
     public void connect();
 
-    public void disConnect();
+    public void closeSessionFactory();
     
     public T getSession();
     
@@ -19,4 +18,4 @@ public interface IConnection<T> {
     
     public void closeSession();
     
-} // .EOF
+}
